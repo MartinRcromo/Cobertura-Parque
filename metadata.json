@@ -1,0 +1,7 @@
+{
+  "name": "Cromosol Park Coverage Analyzer",
+  "description": "Advanced dashboard for analyzing product coverage against the automotive park, featuring Excel import, dynamic filtering, and statistical breakdowns.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
