@@ -105,7 +105,7 @@ export async function fetchProductosByRubro(rubro: string): Promise<ProductRow[]
 
 export async function uploadProductos(items: ProductRow[]): Promise<void> {
   // Detect all unique rubros in this upload to do a clean replace
-  const rubros = [...new Set(items.map(p => p['Nivel 1']).filter(Boolean))];
+  const rubros = [...new Set(items.map(p => p['Nivel 1'] || (p as any)['nivel1']).filter(Boolean))];
 
   if (rubros.length > 0) {
     const { error: delError } = await supabase
@@ -117,8 +117,8 @@ export async function uploadProductos(items: ProductRow[]): Promise<void> {
 
   const rows = items.map(p => ({
     stmvid: Number(p.Stmvid),
-    nivel1: p['Nivel 1'] || '',
-    nivel2: p['Nivel 2'] || null,
+    nivel1: p['Nivel 1'] || (p as any)['nivel1'] || '',
+    nivel2: p['Nivel 2'] || (p as any)['nivel2'] || null,
     proveedor: String(p.Proveedor || ''),
     equivalencia: p.Equivalencia || null,
     numero: (p['Numero '] || (p as any).Numero) || null,
