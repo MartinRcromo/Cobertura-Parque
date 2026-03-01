@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import * as XLSX from 'xlsx';
 import type { Session } from '@supabase/supabase-js';
-import { supabase } from './services/supabase';
+import { supabase, supabaseConfigured } from './services/supabase';
 import {
   fetchParque,
   fetchRubros,
@@ -373,6 +373,33 @@ function App() {
   const scrollTabla = (dir: 'izq' | 'der') => {
     tablaRef.current?.scrollBy({ left: dir === 'izq' ? -400 : 400, behavior: 'smooth' });
   };
+
+  // ── Render: Supabase no configurado ──────────────────────────────────────
+  if (!supabaseConfigured) {
+    return (
+      <div className="min-h-screen bg-red-50 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-red-200 text-center">
+          <div className="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+          </div>
+          <h1 className="text-xl font-bold text-slate-800 mb-2">Faltan variables de entorno</h1>
+          <p className="text-slate-500 text-sm mb-4">
+            La app necesita las credenciales de Supabase para funcionar.
+          </p>
+          <div className="bg-slate-50 rounded-xl p-4 text-left text-xs font-mono text-slate-600 space-y-1 mb-4">
+            <div className="text-red-500 font-bold">Variables requeridas en Netlify:</div>
+            <div>VITE_SUPABASE_URL</div>
+            <div>VITE_SUPABASE_ANON_KEY</div>
+          </div>
+          <p className="text-xs text-slate-400">
+            Netlify → Site configuration → Environment variables → Add, luego triggeá un nuevo deploy.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // ── Render: Auth Loading ──────────────────────────────────────────────────
   if (loadingAuth) {
