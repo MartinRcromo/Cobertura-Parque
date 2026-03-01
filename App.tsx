@@ -18,7 +18,6 @@ import { Filters } from './components/Filters';
 import { ProductModal } from './components/Modal';
 import { PolicyAnalyzer } from './components/PolicyAnalyzer';
 import { HelpModal } from './components/HelpModal';
-import { VoiceAssistant } from './components/VoiceAssistant';
 import { LoginScreen } from './components/LoginScreen';
 import { GlobalDashboard } from './components/GlobalDashboard';
 
@@ -826,8 +825,6 @@ function App() {
         {modalProductos && <ProductModal data={modalProductos} onClose={() => setModalProductos(null)} />}
         {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
 
-        {/* Floating Voice Assistant */}
-        <VoiceAssistant />
       </main>
     </div>
   );
