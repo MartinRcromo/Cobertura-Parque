@@ -377,10 +377,11 @@ function App() {
   // ── Render: Auth Loading ──────────────────────────────────────────────────
   if (loadingAuth) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-indigo-700 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-brand-500 border-t-transparent" />
-          <p className="text-slate-500 font-medium">Cargando...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent" />
+          <p className="text-white font-bold text-lg">Conectando con Supabase...</p>
+          <p className="text-indigo-200 text-sm">v7.1 · Supabase Edition</p>
         </div>
       </div>
     );
@@ -405,7 +406,7 @@ function App() {
             <div>
               <h1 className="text-lg font-bold text-slate-800 leading-tight">
                 Cromosol Park Analyzer
-                <span className="text-brand-500 text-xs font-normal ml-2">v7.0</span>
+                <span className="text-indigo-600 text-xs font-bold ml-2 bg-indigo-50 px-2 py-0.5 rounded-full">v7.1 · Supabase</span>
               </h1>
               <p className="text-xs text-slate-400">{parqueData.length.toLocaleString()} modelos en parque</p>
             </div>
