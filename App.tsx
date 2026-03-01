@@ -146,8 +146,10 @@ function App() {
     try {
       if (tipo === 'productos') {
         const data = await readExcelFile<ProductRow>(file);
-        if (!data[0]?.['Nivel 1'] || !data[0]?.['Nivel 2']) {
-          alert('⚠️ El archivo debe tener columnas "Nivel 1" y "Nivel 2"');
+        const n1key = data[0]?.['Nivel 1'] ? 'Nivel 1' : 'nivel1';
+        const n2key = data[0]?.['Nivel 2'] ? 'Nivel 2' : 'nivel2';
+        if (!data[0]?.[n1key] || !data[0]?.[n2key]) {
+          alert('⚠️ El archivo debe tener columnas "Nivel 1" (o "nivel1") y "Nivel 2" (o "nivel2")');
           return;
         }
         setUploadStatus('Guardando en Supabase...');
@@ -157,7 +159,7 @@ function App() {
         const rubros = await fetchRubros();
         setRubrosList(rubros);
 
-        const firstRubro = data[0]?.['Nivel 1'];
+        const firstRubro = data[0]?.[n1key] as string;
         if (firstRubro) setRubroSeleccionado(firstRubro);
 
         setUploadStatus(`✅ ${data.length} productos guardados`);
