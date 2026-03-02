@@ -150,8 +150,24 @@ function App() {
           alert('⚠️ El archivo no tiene datos o le falta la columna "Stmvid"');
           return;
         }
+
+        // Check for existing data
+        const existingRubros = await fetchRubros();
+        let replaceAll = false;
+        if (existingRubros.length > 0) {
+          const confirmed = window.confirm(
+            `Ya hay productos cargados (${existingRubros.length} rubro${existingRubros.length !== 1 ? 's' : ''}).\n¿Querés borrar todos los datos y reemplazarlos?`
+          );
+          if (!confirmed) {
+            setLoading(false);
+            setUploadStatus('');
+            return;
+          }
+          replaceAll = true;
+        }
+
         setUploadStatus('Guardando en Supabase...');
-        await uploadProductos(data);
+        await uploadProductos(data, replaceAll);
         setProductosData(data);
 
         const rubros = await fetchRubros();
@@ -241,18 +257,18 @@ function App() {
   }, [productosData, excluirProveedor3]);
 
   const nivelesDetectados = useMemo(() => {
-    if (!productosFiltrados) return { nivel1: [], nivel2: [] };
-    const n1 = new Set<string>();
-    const n2 = new Set<string>();
+    if (!productosFiltrados) return { rubro: [], subrubro: [] };
+    const r1 = new Set<string>();
+    const r2 = new Set<string>();
     productosFiltrados.forEach(p => {
-      if (p['Nivel 1']) n1.add(p['Nivel 1']);
-      if (p['Nivel 2']) n2.add(p['Nivel 2']);
+      if (p.rubro) r1.add(p.rubro);
+      if (p.subrubro) r2.add(p.subrubro);
     });
-    const nivel1 = Array.from(n1).sort((a, b) => {
+    const rubro = Array.from(r1).sort((a, b) => {
       const orden: Record<string, number> = { 'AA': 1, 'A': 2, 'B': 3, 'C': 4 };
       return (orden[a] || 99) - (orden[b] || 99) || a.localeCompare(b);
     });
-    return { nivel1, nivel2: Array.from(n2).sort() };
+    return { rubro, subrubro: Array.from(r2).sort() };
   }, [productosFiltrados]);
 
   const processedData = useMemo(() => {
@@ -299,7 +315,7 @@ function App() {
   const datosTabla = useMemo<ProcessedData | null>(() => {
     if (!processedData || !nivelesDetectados) return null;
     const { conCobertura, productsByModelId } = processedData;
-    const { nivel1, nivel2 } = nivelesDetectados;
+    const { rubro, subrubro } = nivelesDetectados;
 
     let filtrados = conCobertura;
     if (filtroCategoria !== 'TODOS') filtrados = filtrados.filter(p => p.Clasificacion === filtroCategoria);
@@ -307,11 +323,11 @@ function App() {
 
     let columnas: string[] = [];
     if (mostrarNivel1 && mostrarNivel2) {
-      nivel1.forEach(n1 => nivel2.forEach(n2 => columnas.push(`${n1}|${n2}`)));
+      rubro.forEach(r1 => subrubro.forEach(r2 => columnas.push(`${r1}|${r2}`)));
     } else if (mostrarNivel1) {
-      columnas = nivel1.map(n1 => `${n1}|ALL`);
+      columnas = rubro.map(r1 => `${r1}|ALL`);
     } else if (mostrarNivel2) {
-      columnas = nivel2.map(n2 => `ALL|${n2}`);
+      columnas = subrubro.map(r2 => `ALL|${r2}`);
     } else {
       columnas = ['ALL|ALL'];
     }
@@ -327,12 +343,12 @@ function App() {
       columnas.forEach(col => { contadores[col] = 0; detalles[col] = []; });
 
       (productsByModelId[id] || []).forEach(prod => {
-        const n1 = prod['Nivel 1'];
-        const n2 = prod['Nivel 2'];
+        const r1 = prod.rubro;
+        const r2 = prod.subrubro;
         let keys: string[] = [];
-        if (mostrarNivel1 && mostrarNivel2) keys = [`${n1}|${n2}`];
-        else if (mostrarNivel1) keys = [`${n1}|ALL`];
-        else if (mostrarNivel2) keys = [`ALL|${n2}`];
+        if (mostrarNivel1 && mostrarNivel2) keys = [`${r1}|${r2}`];
+        else if (mostrarNivel1) keys = [`${r1}|ALL`];
+        else if (mostrarNivel2) keys = [`ALL|${r2}`];
         else keys = ['ALL|ALL'];
         keys.forEach(key => {
           if (contadores[key] !== undefined) {
@@ -342,8 +358,8 @@ function App() {
               numero: prod['Numero '] || (prod as any).Numero,
               marca: prod.Marca,
               proveedor: prod.Proveedor,
-              nivel1: n1,
-              nivel2: n2,
+              rubro: r1,
+              subrubro: r2,
               descripcion: prod['Descripción'] || '',
             });
           }
@@ -361,7 +377,7 @@ function App() {
       };
     });
 
-    return { datos: resultado, columnas, nivel1, nivel2 };
+    return { datos: resultado, columnas, rubro, subrubro };
   }, [processedData, nivelesDetectados, filtroCategoria, filtroMarca, mostrarNivel1, mostrarNivel2]);
 
   const marcasDisponibles = useMemo(
@@ -641,8 +657,8 @@ function App() {
                       excluirProveedor3={excluirProveedor3}
                       setExcluirProveedor3={setExcluirProveedor3}
                       marcasDisponibles={marcasDisponibles}
-                      nivel1={nivelesDetectados.nivel1}
-                      nivel2={nivelesDetectados.nivel2}
+                      nivel1={nivelesDetectados.rubro}
+                      nivel2={nivelesDetectados.subrubro}
                       mostrarNivel1={mostrarNivel1}
                       setMostrarNivel1={setMostrarNivel1}
                       mostrarNivel2={mostrarNivel2}

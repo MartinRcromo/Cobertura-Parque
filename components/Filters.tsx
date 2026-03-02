@@ -90,7 +90,7 @@ export const Filters: React.FC<FiltersProps> = ({
                 />
                 <div className="w-10 h-6 bg-slate-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-brand-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
               </div>
-              <span className="text-sm text-slate-700 group-hover:text-slate-900">Nivel 1</span>
+              <span className="text-sm text-slate-700 group-hover:text-slate-900">Rubro</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer group">
               <div className="relative">
@@ -102,7 +102,7 @@ export const Filters: React.FC<FiltersProps> = ({
                 />
                 <div className="w-10 h-6 bg-slate-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-brand-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
               </div>
-              <span className="text-sm text-slate-700 group-hover:text-slate-900">Nivel 2</span>
+              <span className="text-sm text-slate-700 group-hover:text-slate-900">Subrubro</span>
             </label>
           </div>
           {nivel1.length > 0 && <div className="text-xs text-slate-400 mt-1 truncate">Ej: {nivel1.slice(0,3).join(', ')}...</div>}

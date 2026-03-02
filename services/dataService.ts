@@ -63,11 +63,11 @@ export async function upsertParque(items: ParkVehicle[]): Promise<void> {
 export async function fetchRubros(): Promise<string[]> {
   const { data, error } = await supabase
     .from('productos')
-    .select('nivel1');
+    .select('rubro');
 
   if (error) throw new Error(error.message);
 
-  const unique = [...new Set((data || []).map((r: any) => r.nivel1 as string))]
+  const unique = [...new Set((data || []).map((r: any) => r.rubro as string))]
     .filter(Boolean)
     .sort();
   return unique;
@@ -81,7 +81,7 @@ export async function fetchProductosByRubro(rubro: string): Promise<ProductRow[]
     const { data, error } = await supabase
       .from('productos')
       .select('*')
-      .eq('nivel1', rubro)
+      .eq('rubro', rubro)
       .range(from, from + PAGE_SIZE - 1);
 
     if (error) throw new Error(error.message);
@@ -93,8 +93,8 @@ export async function fetchProductosByRubro(rubro: string): Promise<ProductRow[]
 
   return all.map(r => ({
     Stmvid: r.stmvid,
-    'Nivel 1': r.nivel1,
-    'Nivel 2': r.nivel2 || '',
+    rubro: r.rubro,
+    subrubro: r.subrubro || '',
     Proveedor: r.proveedor || '',
     Equivalencia: r.equivalencia || '',
     'Numero ': r.numero || '',
@@ -103,22 +103,28 @@ export async function fetchProductosByRubro(rubro: string): Promise<ProductRow[]
   }));
 }
 
-export async function uploadProductos(items: ProductRow[]): Promise<void> {
-  // Detect all unique rubros in this upload to do a clean replace
-  const rubros = [...new Set(items.map(p => p['Nivel 1'] || (p as any)['nivel1']).filter(Boolean))];
-
-  if (rubros.length > 0) {
+export async function uploadProductos(items: ProductRow[], replaceAll = false): Promise<void> {
+  if (replaceAll) {
     const { error: delError } = await supabase
       .from('productos')
       .delete()
-      .in('nivel1', rubros);
+      .not('stmvid', 'is', null);
     if (delError) throw new Error(delError.message);
+  } else {
+    const rubros = [...new Set(items.map(p => p.rubro).filter(Boolean))];
+    if (rubros.length > 0) {
+      const { error: delError } = await supabase
+        .from('productos')
+        .delete()
+        .in('rubro', rubros);
+      if (delError) throw new Error(delError.message);
+    }
   }
 
   const rows = items.map(p => ({
     stmvid: Number(p.Stmvid),
-    nivel1: p['Nivel 1'] || (p as any)['nivel1'] || '',
-    nivel2: p['Nivel 2'] || (p as any)['nivel2'] || null,
+    rubro: p.rubro || '',
+    subrubro: p.subrubro || null,
     proveedor: String(p.Proveedor || ''),
     equivalencia: p.Equivalencia || null,
     numero: (p['Numero '] || (p as any).Numero) || null,
@@ -136,13 +142,13 @@ export async function uploadProductos(items: ProductRow[]): Promise<void> {
 // ─── DASHBOARD GLOBAL ──────────────────────────────────────────────────────
 
 export async function fetchAllStmvidsByRubro(): Promise<Record<string, number[]>> {
-  const all: { nivel1: string; stmvid: number }[] = [];
+  const all: { rubro: string; stmvid: number }[] = [];
   let from = 0;
 
   while (true) {
     const { data, error } = await supabase
       .from('productos')
-      .select('nivel1, stmvid')
+      .select('rubro, stmvid')
       .range(from, from + PAGE_SIZE - 1);
 
     if (error) throw new Error(error.message);
@@ -152,11 +158,10 @@ export async function fetchAllStmvidsByRubro(): Promise<Record<string, number[]>
     from += PAGE_SIZE;
   }
 
-  // Group by nivel1, deduplicate stmvids with a Set
   const tempMap: Record<string, Set<number>> = {};
   all.forEach(r => {
-    if (!tempMap[r.nivel1]) tempMap[r.nivel1] = new Set();
-    tempMap[r.nivel1].add(Number(r.stmvid));
+    if (!tempMap[r.rubro]) tempMap[r.rubro] = new Set();
+    tempMap[r.rubro].add(Number(r.stmvid));
   });
 
   const result: Record<string, number[]> = {};

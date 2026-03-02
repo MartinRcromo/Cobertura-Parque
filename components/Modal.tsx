@@ -59,7 +59,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ data, onClose }) => 
                       <div className="font-mono font-bold text-indigo-600">{p.equivalencia}</div>
                       <div className="text-xs text-slate-500">{p.numero}</div>
                     </td>
-                    <td className="px-6 py-3 text-slate-600 font-medium">{p.nivel2}</td>
+                    <td className="px-6 py-3 text-slate-600 font-medium">{p.subrubro}</td>
                     <td className="px-6 py-3 text-center">
                       {esProv3 ? (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200">

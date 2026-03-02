@@ -3,7 +3,7 @@ import { ParkVehicle } from '../types';
 import { fetchAllStmvidsByRubro } from '../services/dataService';
 
 interface RubroStats {
-  nivel1: string;
+  rubro: string;
   totalModelos: number;
   modelosCubiertos: number;
   modelosSinCobertura: number;
@@ -25,7 +25,7 @@ export function GlobalDashboard({ parqueData, onSelectRubro, rubroActivo }: Prop
   const [stats, setStats] = useState<RubroStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<'nivel1' | 'porcentaje' | 'cubiertos'>('nivel1');
+  const [sortBy, setSortBy] = useState<'rubro' | 'porcentaje' | 'cubiertos'>('rubro');
 
   useEffect(() => {
     if (parqueData.length === 0) return;
@@ -46,7 +46,7 @@ export function GlobalDashboard({ parqueData, onSelectRubro, rubroActivo }: Prop
       const clasificaciones = ['AA', 'A', 'B', 'C'];
       const totalModelos = parqueData.length;
 
-      const computed: RubroStats[] = Object.entries(coverageByRubro).map(([nivel1, stmvids]) => {
+      const computed: RubroStats[] = Object.entries(coverageByRubro).map(([rubro, stmvids]) => {
         const stmvidSet = new Set(stmvids);
 
         const cubiertos = parqueData.filter(p => stmvidSet.has(Number(p.IDMODELO))).length;
@@ -64,7 +64,7 @@ export function GlobalDashboard({ parqueData, onSelectRubro, rubroActivo }: Prop
         });
 
         return {
-          nivel1,
+          rubro,
           totalModelos,
           modelosCubiertos: cubiertos,
           modelosSinCobertura: sinCobertura,
@@ -82,7 +82,7 @@ export function GlobalDashboard({ parqueData, onSelectRubro, rubroActivo }: Prop
   };
 
   const sorted = [...stats].sort((a, b) => {
-    if (sortBy === 'nivel1') return a.nivel1.localeCompare(b.nivel1);
+    if (sortBy === 'rubro') return a.rubro.localeCompare(b.rubro);
     if (sortBy === 'porcentaje') return b.porcentaje - a.porcentaje;
     return b.modelosCubiertos - a.modelosCubiertos;
   });
@@ -167,7 +167,7 @@ export function GlobalDashboard({ parqueData, onSelectRubro, rubroActivo }: Prop
             {stats.length > 0 ? `${Math.max(...stats.map(s => s.porcentaje))}%` : '-'}
           </p>
           <p className="text-xs text-green-600 mt-0.5 truncate">
-            {stats.length > 0 ? [...stats].sort((a, b) => b.porcentaje - a.porcentaje)[0].nivel1 : '-'}
+            {stats.length > 0 ? [...stats].sort((a, b) => b.porcentaje - a.porcentaje)[0].rubro : '-'}
           </p>
         </div>
         <div className="bg-white rounded-xl border border-red-200 p-4 shadow-sm bg-red-50/40">
@@ -176,7 +176,7 @@ export function GlobalDashboard({ parqueData, onSelectRubro, rubroActivo }: Prop
             {stats.length > 0 ? `${Math.min(...stats.map(s => s.porcentaje))}%` : '-'}
           </p>
           <p className="text-xs text-red-500 mt-0.5 truncate">
-            {stats.length > 0 ? [...stats].sort((a, b) => a.porcentaje - b.porcentaje)[0].nivel1 : '-'}
+            {stats.length > 0 ? [...stats].sort((a, b) => a.porcentaje - b.porcentaje)[0].rubro : '-'}
           </p>
         </div>
       </div>
@@ -195,7 +195,7 @@ export function GlobalDashboard({ parqueData, onSelectRubro, rubroActivo }: Prop
               onChange={e => setSortBy(e.target.value as any)}
               className="border border-slate-300 rounded-lg px-2 py-1 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
-              <option value="nivel1">Nombre</option>
+              <option value="rubro">Nombre</option>
               <option value="porcentaje">% Cobertura</option>
               <option value="cubiertos">Modelos cubiertos</option>
             </select>
@@ -221,12 +221,12 @@ export function GlobalDashboard({ parqueData, onSelectRubro, rubroActivo }: Prop
             <tbody className="divide-y divide-slate-100">
               {sorted.map(s => (
                 <tr
-                  key={s.nivel1}
-                  className={`hover:bg-slate-50 transition-colors ${rubroActivo === s.nivel1 ? 'bg-brand-50/60 border-l-4 border-l-brand-500' : ''}`}
+                  key={s.rubro}
+                  className={`hover:bg-slate-50 transition-colors ${rubroActivo === s.rubro ? 'bg-brand-50/60 border-l-4 border-l-brand-500' : ''}`}
                 >
                   <td className="px-6 py-4">
-                    <span className="font-semibold text-slate-800">{s.nivel1}</span>
-                    {rubroActivo === s.nivel1 && (
+                    <span className="font-semibold text-slate-800">{s.rubro}</span>
+                    {rubroActivo === s.rubro && (
                       <span className="ml-2 text-xs bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full font-medium">
                         activa
                       </span>
@@ -270,7 +270,7 @@ export function GlobalDashboard({ parqueData, onSelectRubro, rubroActivo }: Prop
                   })}
                   <td className="px-4 py-4 text-center">
                     <button
-                      onClick={() => onSelectRubro(s.nivel1)}
+                      onClick={() => onSelectRubro(s.rubro)}
                       className="text-xs bg-brand-600 hover:bg-brand-700 text-white font-semibold px-3 py-1.5 rounded-lg transition-colors"
                     >
                       Analizar →

@@ -15,8 +15,8 @@ export interface ParkVehicle {
 
 export interface ProductRow {
   Stmvid: string | number; // ID that links to IDMODELO
-  "Nivel 1": string;
-  "Nivel 2": string;
+  rubro: string;
+  subrubro?: string;
   Proveedor: string | number;
   Equivalencia?: string;
   "Numero "?: string;
@@ -40,8 +40,8 @@ export interface ProductDetailItem {
   numero: string;
   marca: string;
   proveedor: string | number;
-  nivel1: string;
-  nivel2: string;
+  rubro: string;
+  subrubro: string;
   descripcion: string;
 }
 
@@ -58,8 +58,8 @@ export interface ModelCoverageData {
 export interface ProcessedData {
   datos: Record<string, Record<string, ModelCoverageData>>;
   columnas: string[];
-  nivel1: string[];
-  nivel2: string[];
+  rubro: string[];
+  subrubro: string[];
 }
 
 // --- New Types for Policy Analysis ---
